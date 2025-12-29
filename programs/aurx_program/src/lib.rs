@@ -7,6 +7,7 @@ pub mod aurx_program {
     use super::*;
 
     pub fn store_hash(ctx: Context<StoreHash>, user_email: String, file_id: String, hash: String) -> Result<()> {
+        require!(hash.as_bytes().len() <= 64, AxumError::HashTooLong);
         ctx.accounts.storage_pda.hash = hash;
         Ok(())
     }
@@ -25,4 +26,10 @@ pub struct StoreHash<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
     pub system_program: Program<'info, System>,
+}
+
+#[error_code]
+pub enum AxumError {
+    #[msg("Hash is too long.")]
+    HashTooLong
 }
